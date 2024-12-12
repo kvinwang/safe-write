@@ -40,8 +40,9 @@ use fs::OpenOptions;
 /// Returns `io::Result<()>` which is:
 /// * `Ok(())` if the write was successful
 /// * `Err(e)` if any IO operation failed
-pub fn safe_write<P: AsRef<Path>>(path: P, content: &[u8]) -> io::Result<()> {
+pub fn safe_write(path: impl AsRef<Path>, content: impl AsRef<[u8]>) -> io::Result<()> {
     let path = path.as_ref();
+    let content = content.as_ref();
     let parent = path.parent().unwrap_or_else(|| Path::new("."));
 
     // Create parent directory if it doesn't exist
@@ -82,14 +83,14 @@ mod tests {
     fn test_basic_write() -> io::Result<()> {
         let temp_dir = TempDir::new()?;
         let test_path = temp_dir.path().join("test.txt");
-        
+
         let content = b"Hello, World!";
         safe_write(&test_path, content)?;
 
         // Verify the content was written correctly
         let read_content = fs::read(&test_path)?;
         assert_eq!(content, read_content.as_slice());
-        
+
         Ok(())
     }
 
@@ -97,14 +98,14 @@ mod tests {
     fn test_nested_directory_creation() -> io::Result<()> {
         let temp_dir = TempDir::new()?;
         let test_path = temp_dir.path().join("nested/dirs/test.txt");
-        
+
         let content = b"Nested content";
         safe_write(&test_path, content)?;
 
         assert!(test_path.exists());
         let read_content = fs::read(&test_path)?;
         assert_eq!(content, read_content.as_slice());
-        
+
         Ok(())
     }
 
@@ -112,17 +113,17 @@ mod tests {
     fn test_overwrite_existing() -> io::Result<()> {
         let temp_dir = TempDir::new()?;
         let test_path = temp_dir.path().join("overwrite.txt");
-        
+
         // Write initial content
         safe_write(&test_path, b"Initial content")?;
-        
+
         // Overwrite with new content
         let new_content = b"New content";
         safe_write(&test_path, new_content)?;
 
         let read_content = fs::read(&test_path)?;
         assert_eq!(new_content, read_content.as_slice());
-        
+
         Ok(())
     }
 }
