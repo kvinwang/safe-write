@@ -1,0 +1,13 @@
+[package]
+name = "safe-write"
+version = "0.1.0"
+edition = "2021"
+description = "A safe file writing utility"
+license = "MIT"
+repository = "https://github.com/kvinwang/safe-write"
+
+[dependencies]
+fs-err = "3.0.0"
+
+[dev-dependencies]
+tempfile = "3.8"
