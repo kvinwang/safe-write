@@ -51,6 +51,10 @@ pub fn safe_write(path: impl AsRef<Path>, content: impl AsRef<[u8]>) -> io::Resu
     // Create a temporary file by appending .tmp to the original path
     let temp_path = path.with_extension("tmp");
 
+    if temp_path.exists() {
+        fs::remove_file(&temp_path)?;
+    }
+
     let mut temp_file = OpenOptions::new()
         .write(true)
         .create_new(true)
